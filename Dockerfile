@@ -1,11 +1,19 @@
-FROM golang:1.6
+FROM alpine:3.5
 
-RUN go get golang.org/x/tools/go/vcs
+RUN apk update && \
+    apk add git mercurial ca-certificates && \
+    rm -rf /var/cache/apk/*
 
-COPY . $GOPATH/src/github.com/lfkeitel/goreportcard
+ENV GOPATH=/app/repos
 
-WORKDIR $GOPATH/src/github.com/lfkeitel/goreportcard
+COPY goreportcard /app/goreportcard
+COPY templates /app/templates
+COPY assets /app/assets
+COPY build-tmp/* /usr/local/sbin/
+COPY docker-shim.sh /usr/local/sbin/go
 
-EXPOSE 8080
+WORKDIR /app
 
-CMD ["make", "start"]
+EXPOSE 8000
+
+ENTRYPOINT ["/app/goreportcard"]

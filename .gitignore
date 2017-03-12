@@ -27,5 +27,8 @@ _testmain.go
 *.DS_Store
 repos
 
+goreportcard
 goreportcard.db
 goreportcard.db.lock
+
+build-tmp/

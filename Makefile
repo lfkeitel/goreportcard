@@ -1,3 +1,9 @@
+DOCKER_DIR := /go/src/github.com/lfkeitel/goreportcard
+DOCKER_PWD := $(PWD)
+ifeq ($(shell uname -o), Cygwin)
+DOCKER_PWD := //c/cygwin64$(PWD)
+endif
+
 all: lint build test
 
 build:
@@ -25,3 +31,12 @@ start-dev:
 
 misspell:
 	find . -name '*.go' -not -path './vendor/*' | xargs misspell -error
+
+docker:
+	mkdir -p build-tmp
+	docker run --rm \
+		-v $(DOCKER_PWD):$(DOCKER_DIR) \
+		-w $(DOCKER_DIR) \
+		-e CGO_ENABLED=0 \
+		golang:1.8 /bin/bash -c 'make install-deps; make build; go get github.com/golang/go/src/cmd/gofmt; go get github.com/golang/go/src/cmd/vet; cp $$GOPATH/bin/* ./build-tmp'
+	docker build -t goreportcard .
