@@ -21,7 +21,7 @@ func TestRepoRootForImportPath(t *testing.T) {
 	}
 
 	for _, tt := range cases {
-		root, err := Download(tt.giveURL, testDownloadDir)
+		root, err := Download(tt.giveURL, testDownloadDir, "")
 		if err != nil {
 			t.Fatalf("Error calling Download(%q): %v", tt.giveURL, err)
 		}
