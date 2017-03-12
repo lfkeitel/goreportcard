@@ -1,12 +1,12 @@
 language: go
 
-go: 
+go:
   - 1.7
   - 1.8
   - tip
 
 install:
-  - make install
+  - make install-deps
 
 script:
   - make lint
