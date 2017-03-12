@@ -11,14 +11,14 @@ import (
 )
 
 // Download takes a user-provided string that represents a remote
-// Go repository, and attempts to download it in a way similar to go get.
-// It is forgiving in terms of the exact path given: the path may have
-// a scheme or username, which will be trimmed.
-func Download(path, dest string) (root *vcs.RepoRoot, err error) {
-	return download(path, dest, true)
+// Go repository and branch, and attempts to download it in a way
+// similar to go get. It is forgiving in terms of the exact path
+// given: the path may have a scheme or username, which will be trimmed.
+func Download(path, dest, branch string) (root *vcs.RepoRoot, err error) {
+	return download(path, dest, branch, true)
 }
 
-func download(path, dest string, firstAttempt bool) (root *vcs.RepoRoot, err error) {
+func download(path, dest, branch string, firstAttempt bool) (root *vcs.RepoRoot, err error) {
 	vcs.ShowCmd = true
 
 	path, err = Clean(path)
@@ -53,7 +53,7 @@ func download(path, dest string, firstAttempt bool) (root *vcs.RepoRoot, err err
 			if err != nil {
 				log.Println("Failed to delete path:", fullLocalPath, err)
 			}
-			return download(path, dest, false)
+			return download(path, dest, branch, false)
 		} else if err != nil {
 			return root, err
 		}
@@ -65,12 +65,12 @@ func download(path, dest string, firstAttempt bool) (root *vcs.RepoRoot, err err
 			return root, err
 		}
 	}
-	err = root.VCS.TagSync(fullLocalPath, "")
+	err = root.VCS.TagSync(fullLocalPath, branch)
 	if err != nil && firstAttempt {
 		// may have been rebased; we delete the directory, then try one more time:
 		log.Printf("Failed to update %q (%v), trying again...", root.Repo, err.Error())
 		err = os.RemoveAll(fullLocalPath)
-		return download(path, dest, false)
+		return download(path, dest, branch, false)
 	}
 	return root, err
 }

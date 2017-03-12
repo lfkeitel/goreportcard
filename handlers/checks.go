@@ -10,8 +10,8 @@ import (
 
 	"github.com/boltdb/bolt"
 	humanize "github.com/dustin/go-humanize"
-	"github.com/gojp/goreportcard/check"
-	"github.com/gojp/goreportcard/download"
+	"github.com/lfkeitel/goreportcard/check"
+	"github.com/lfkeitel/goreportcard/download"
 )
 
 func dirName(repo string) string {
@@ -74,7 +74,7 @@ type checksResp struct {
 	HumanizedLastRefresh string    `json:"humanized_last_refresh"`
 }
 
-func newChecksResp(repo string, forceRefresh bool) (checksResp, error) {
+func newChecksResp(repo, branch string, forceRefresh bool) (checksResp, error) {
 	if !forceRefresh {
 		resp, err := getFromCache(repo)
 		if err != nil {
@@ -87,7 +87,7 @@ func newChecksResp(repo string, forceRefresh bool) (checksResp, error) {
 	}
 
 	// fetch the repo and grade it
-	repoRoot, err := download.Download(repo, "repos/src")
+	repoRoot, err := download.Download(repo, "repos/src", branch)
 	if err != nil {
 		return checksResp{}, fmt.Errorf("could not clone repo: %v", err)
 	}

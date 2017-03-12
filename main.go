@@ -9,14 +9,15 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/gojp/goreportcard/handlers"
+	"github.com/lfkeitel/goreportcard/handlers"
 
 	"github.com/boltdb/bolt"
 )
 
 var (
-	addr = flag.String("http", ":8000", "HTTP listen address")
-	dev  = flag.Bool("dev", false, "dev mode")
+	addr   = flag.String("http", ":8000", "HTTP listen address")
+	dev    = flag.Bool("dev", false, "dev mode")
+	branch = flag.String("branch", "", "git branch to checkout")
 )
 
 func makeHandler(name string, dev bool, fn func(http.ResponseWriter, *http.Request, string, bool)) http.HandlerFunc {
@@ -87,6 +88,7 @@ func main() {
 		log.Fatal("ERROR: could not open bolt db: ", err)
 	}
 
+	handlers.SetGitBranch(*branch)
 	http.HandleFunc("/assets/", handlers.AssetsHandler)
 	http.HandleFunc("/favicon.ico", handlers.FaviconHandler)
 	http.HandleFunc("/checks", handlers.CheckHandler)

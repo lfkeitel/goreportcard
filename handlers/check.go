@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/boltdb/bolt"
-	"github.com/gojp/goreportcard/download"
+	"github.com/lfkeitel/goreportcard/download"
 )
 
 const (
@@ -24,6 +24,13 @@ const (
 	// top 100 high scores, and other meta information
 	MetaBucket string = "meta"
 )
+
+var gitBranch string
+
+// SetGitBranch sets which branch to checkout from the repository
+func SetGitBranch(branch string) {
+	gitBranch = branch
+}
 
 // CheckHandler handles the request for checking a repo
 func CheckHandler(w http.ResponseWriter, r *http.Request) {
@@ -40,7 +47,7 @@ func CheckHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Checking repo %q...", repo)
 
 	forceRefresh := r.Method != "GET" // if this is a GET request, try to fetch from cached version in boltdb first
-	resp, err := newChecksResp(repo, forceRefresh)
+	resp, err := newChecksResp(repo, gitBranch, forceRefresh)
 	if err != nil {
 		log.Println("ERROR: from newChecksResp:", err)
 		w.WriteHeader(http.StatusBadRequest)
